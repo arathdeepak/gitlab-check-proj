@@ -2,3 +2,6 @@ docker build -t custom-grafana .
 
 docker run -d -p 3000:3000 --name grafana custom-grafana
 
+
+node_filesystem_avail_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"}
+
