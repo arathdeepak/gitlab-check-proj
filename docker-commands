@@ -14,4 +14,7 @@ node_filesystem_size_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"
 
 (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
 
+wget https://github.com/prometheus-community/http_json_exporter/releases/download/v0.6.0/http_json_exporter-0.6.0-linux-amd64.tar.gz
+tar -xvzf http_json_exporter-0.6.0-linux-amd64.tar.gz
+cd http_json_exporter-0.6.0-linux-amd64
 
