@@ -11,3 +11,7 @@ node_filesystem_size_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"
 
 (node_filesystem_size_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"} - node_filesystem_avail_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"}) / node_filesystem_size_bytes{job="node_exporter",fstype=~"ext4|xfs",mountpoint="/"} * 100
 
+
+(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+
+
