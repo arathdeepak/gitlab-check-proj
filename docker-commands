@@ -18,3 +18,5 @@ wget https://github.com/prometheus-community/http_json_exporter/releases/downloa
 tar -xvzf http_json_exporter-0.6.0-linux-amd64.tar.gz
 cd http_json_exporter-0.6.0-linux-amd64
 
+sum(rate(node_cpu_seconds_total{mode="user"}[1m])) by (instance)
+
