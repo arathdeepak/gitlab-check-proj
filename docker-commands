@@ -20,3 +20,6 @@ cd http_json_exporter-0.6.0-linux-amd64
 
 sum(rate(node_cpu_seconds_total{mode="user"}[1m])) by (instance)
 
+100 * sum(rate(node_cpu_seconds_total{mode="user"}[1m]) + rate(node_cpu_seconds_total{mode="system"}[1m]) + rate(node_cpu_seconds_total{mode="iowait"}[1m])) 
+  / sum(rate(node_cpu_seconds_total[1m])) by (instance)
+
