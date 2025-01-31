@@ -1,0 +1,7 @@
+insert_job: fw_job_machine1
+job_type: fw
+machine: Machine1
+file_watcher: Y
+watch_file: "/path/to/watch/myfile.txt"
+run_window: "00:00-23:59"
+exit_codes: "0, 1"  # Treat exit code 1 (file not found) as IN (inactive) or SU (successful)
