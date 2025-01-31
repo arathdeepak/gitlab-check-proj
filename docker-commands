@@ -23,3 +23,111 @@ sum(rate(node_cpu_seconds_total{mode="user"}[1m])) by (instance)
 100 * sum(rate(node_cpu_seconds_total{mode="user"}[1m]) + rate(node_cpu_seconds_total{mode="system"}[1m]) + rate(node_cpu_seconds_total{mode="iowait"}[1m])) 
   / sum(rate(node_cpu_seconds_total[1m])) by (instance)
 
+
+CPU:
+# Query for CPU Usage (%)
+100 - (avg by (instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+# Query for CPU Usage by Core
+100 - (avg by (instance, cpu)(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+Mem:
+# Query for Memory Usage (Used)
+(node_memory_MemTotal_bytes - node_memory_MemFree_bytes - node_memory_Buffers_bytes - node_memory_Cached_bytes) / node_memory_MemTotal_bytes * 100
+
+# Query for Available Memory
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100
+
+3. Disk Usage
+Query for Disk Usage (Used)
+
+prometheus
+Copy
+(node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100
+Displays disk usage as a percentage for mounted filesystems.
+
+Query for Disk I/O (Read/Write)
+
+prometheus
+Copy
+rate(node_disk_read_bytes_total[5m])
+rate(node_disk_written_bytes_total[5m])
+These queries show the rate of disk read and write operations over the last 5 minutes.
+
+4. Network Usage
+Query for Network Received/Transmitted Bytes
+
+prometheus
+Copy
+rate(node_network_receive_bytes_total[5m])
+rate(node_network_transmit_bytes_total[5m])
+These queries show the rate of network traffic received and transmitted on all interfaces.
+
+Query for Network Errors
+
+prometheus
+Copy
+rate(node_network_receive_errs_total[5m])
+rate(node_network_transmit_errs_total[5m])
+This query can help monitor the network errors (received and transmitted) over time.
+
+5. System Load
+Query for System Load Average (1-minute)
+
+prometheus
+Copy
+node_load1
+Shows the system load average over the last 1 minute.
+
+Query for System Load Average (5-minute)
+
+prometheus
+Copy
+node_load5
+Query for System Load Average (15-minute)
+
+prometheus
+Copy
+node_load15
+6. Uptime
+Query for System Uptime
+
+prometheus
+Copy
+node_time_seconds - node_boot_time_seconds
+This query calculates how long the server has been running since its last boot.
+
+7. Process Metrics
+Query for Running Processes
+
+prometheus
+Copy
+node_processes
+Displays the total number of processes running on the system.
+
+8. Filesystem Metrics
+Query for Filesystem Disk Space Used
+
+prometheus
+Copy
+node_filesystem_size_bytes - node_filesystem_free_bytes
+This shows the used disk space on the filesystem.
+
+9. Swap Usage
+Query for Swap Usage
+
+prometheus
+Copy
+(node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes) / node_memory_SwapTotal_bytes * 100
+Shows swap usage as a percentage.
+
+10. File Descriptor Usage
+Query for Open File Descriptors
+
+prometheus
+Copy
+node_filefd_allocated
+This shows the number of allocated file descriptors on the system.
+
+
+
