@@ -132,4 +132,4 @@ This shows the number of allocated file descriptors on the system.
 
 keytool -importcert -alias <alias> -file <path-to-certificate-file> -keystore <path-to-cacerts>
 
-
+openssl s_client -connect <hostname>:443 -showcerts
