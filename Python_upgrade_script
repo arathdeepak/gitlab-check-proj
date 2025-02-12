@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Find the path to pip3.9
+pip3_9_path=$(which pip3.9)
+
+# If pip3.9 is not found, exit
+if [[ -z "$pip3_9_path" ]]; then
+  echo "pip3.9 is not installed or not found in PATH. Exiting."
+  exit 1
+fi
+
+# Find the alternatives path for pip3
+pip3_alternatives=$(alternatives --display pip3 2>/dev/null)
+
+# Extract available alternatives numbers from the output
+available_numbers=$(echo "$pip3_alternatives" | grep -oP '(\d+)\s+/\S+' | grep "$pip3_9_path" | awk '{print $1}')
+
+# If no number is found, exit
+if [[ -z "$available_numbers" ]]; then
+  echo "No alternatives for pip3 found associated with pip3.9. Exiting."
+  exit 1
+fi
+
+# Set the appropriate number for pip3 to point to pip3.9
+echo "$available_numbers" | xargs -I {} sudo alternatives --set pip3 /usr/bin/pip3.9
+
+# Verify the change
+echo "pip3 is now set to:"
+pip3 --version
