@@ -1,0 +1,42 @@
+## Create USER:
+
+CREATE USER 'prometheus'@'localhost' IDENTIFIED BY 'your_password';
+GRANT PROCESS, REPLICATION CLIENT, SHOW DATABASES, SELECT ON *.* TO 'prometheus'@'localhost';
+FLUSH PRIVILEGES;
+
+
+# Start mysqld_exporter
+mysqld_exporter --web.listen-address=":9104" --web.telemetry-path="/metrics" --mysql.user="prometheus" --mysql.pass="your_password" --mysql.host="localhost"
+
+
+# If you want to monitor specific queries (e.g., the results of a custom query), you can use mysqld_exporter’s custom queries functionality.
+
+Create a custom SQL query file to run the query. For example, create a file custom_queries.sql with your query.
+sql
+Copy
+-- custom_queries.sql
+ " SELECT COUNT(*) FROM your_table WHERE your_condition = TRUE;  "
+
+# Extended Query
+mysqld_exporter --web.listen-address=":9104" --web.telemetry-path="/metrics" --mysql.user="prometheus" --mysql.pass="your_password" --mysql.host="localhost" --extend.query-path="/path/to/custom_queries.sql"
+
+Start MYSQL_EXPORTTER:
+
+scrape_configs:
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['client_machine_ip:9104']
+
+
+# In your Prometheus config file
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['localhost:9187']
+    metrics_path: '/metrics'
+    params:
+      query: 'SELECT count(*) FROM my_table WHERE condition = true;'  # Your custom SQL query
+
+
+# PROMQL:
+
+mysql_custom_query_result{job="mysql"}
