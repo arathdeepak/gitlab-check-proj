@@ -45,3 +45,6 @@ mysql_custom_query_result{job="mysql"}
 
 oracledb_exporter --username=oracle_user --password=oracle_password --connect-string=//localhost:1521/ORCLCDB
 
+
+^
+
