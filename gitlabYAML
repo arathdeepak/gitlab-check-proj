@@ -1,0 +1,117 @@
+stages:
+  - wave_1
+  - wave_2
+  - wave_3
+  - wave_4
+
+variables:
+  MAVEN_SETTINGS: "$CI_PROJECT_DIR/.maven-settings.xml"  # Replace with actual path to maven settings
+  MAVEN_OPTS: ""  # Any additional Maven options you want to set
+  CUSTOM_MVN_OPTS: ""  # Any custom Maven options
+
+# Define the dependency structure
+dependencies:
+  a:
+    depends_on: []
+  b:
+    depends_on: [a]
+  c:
+    depends_on: [a]
+  d:
+    depends_on: [a]
+  e:
+    depends_on: [b]
+  f:
+    depends_on: [b]
+  g:
+    depends_on: [a]
+  h:
+    depends_on: [e]
+  i:
+    depends_on: [e]
+  j:
+    depends_on: [e]
+
+# This helper job runs the publish_snapshot command
+publish_snapshot:
+  script:
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+
+# Wave 1: Build component 'a'
+wave_1:
+  stage: wave_1
+  script:
+    - echo "Building component a"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "a"
+
+# Wave 2: Build components 'b', 'c', and 'd' (depends on 'a')
+wave_2:
+  stage: wave_2
+  needs: [wave_1] # Ensure wave_2 only starts after wave_1
+  parallel:
+    matrix:
+      - COMPONENT: "b"
+      - COMPONENT: "c"
+      - COMPONENT: "d"
+  script:
+    - echo "Building component $COMPONENT"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "b"
+        BUILD_TARGET: "c"
+        BUILD_TARGET: "d"
+
+# Wave 3: Build components 'e', 'f', 'g' (depends on 'b', 'c', 'd')
+wave_3:
+  stage: wave_3
+  needs: [wave_2] # Ensure wave_3 only starts after wave_2
+  parallel:
+    matrix:
+      - COMPONENT: "e"
+      - COMPONENT: "f"
+      - COMPONENT: "g"
+  script:
+    - echo "Building component $COMPONENT"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "e"
+        BUILD_TARGET: "f"
+        BUILD_TARGET: "g"
+
+# Wave 4: Build components 'h', 'i', 'j' (depends on 'e')
+wave_4:
+  stage: wave_4
+  needs: [wave_3] # Ensure wave_4 only starts after wave_3
+  parallel:
+    matrix:
+      - COMPONENT: "h"
+      - COMPONENT: "i"
+      - COMPONENT: "j"
+  script:
+    - echo "Building component $COMPONENT"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "h"
+        BUILD_TARGET: "i"
+        BUILD_TARGET: "j"
+
+# Custom job to allow developers to specify individual components or "ALL"
+dynamic_build:
+  script:
+    - echo "Dynamic Build Job"
+  when: manual
+  variables:
+    BUILD_TARGET: "ALL" # This is the default, but it can be set to an individual component for more granular control.
+    # Example usage: Add a pipeline input to set BUILD_TARGET to "b" or "c", or leave as "ALL".
+  only:
+    - triggers
