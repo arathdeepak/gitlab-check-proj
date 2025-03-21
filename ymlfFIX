@@ -1,0 +1,9 @@
+web-sso:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building web-sso"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'  # Adjust as needed
+    - if: '$BUILD_TARGET == "web-sso"'
