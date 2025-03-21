@@ -1,0 +1,222 @@
+stages:
+  - wave_1
+  - wave_2
+  - wave_3
+  - wave_4
+
+variables:
+  MAVEN_SETTINGS: "$CI_PROJECT_DIR/.maven-settings.xml"
+  MAVEN_OPTS: ""
+  CUSTOM_MVN_OPTS: ""
+
+# Wave 1: Building merit2-common (no dependencies)
+merit2-common:
+  stage: wave_1
+  script:
+    - echo "Building merit2-common"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "merit2-common"
+
+# Wave 2: Building components that depend on merit2-common
+web-sso:
+  stage: wave_2
+  needs: [merit2-common]  # depends on merit2-common
+  script:
+    - echo "Building web-sso"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "web-sso"
+
+tradersbook-fincad:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building tradersbook-fincad"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-fincad"
+
+tradersbook-mt-vrdo-processor:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building tradersbook-mt-vrdo-processor"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-mt-vrdo-processor"
+
+secmaster-mt:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building secmaster-mt"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "secmaster-mt"
+
+admin-mt:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building admin-mt"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "admin-mt"
+
+ctm-eisl-service:
+  stage: wave_2
+  needs: [merit2-common]
+  script:
+    - echo "Building ctm-eisl-service"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "ctm-eisl-service"
+
+# Wave 3: Components that depend on multiple previous components
+tradersbook-instrument-store:
+  stage: wave_3
+  needs: [merit2-common, tradersbook-fincad]  # depends on merit2-common and tradersbook-fincad
+  script:
+    - echo "Building tradersbook-instrument-store"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-instrument-store"
+
+secmaster-ui:
+  stage: wave_3
+  needs: [merit2-common, secmaster-mt]  # depends on merit2-common and secmaster-mt
+  script:
+    - echo "Building secmaster-ui"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "secmaster-ui"
+
+admin-ui:
+  stage: wave_3
+  needs: [merit2-common, admin-mt]  # depends on merit2-common and admin-mt
+  script:
+    - echo "Building admin-ui"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "admin-ui"
+
+trade-processor-ctm:
+  stage: wave_3
+  needs: [merit2-common, ctm-eisl-service]  # depends on merit2-common and ctm-eisl-service
+  script:
+    - echo "Building trade-processor-ctm"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "trade-processor-ctm"
+
+tradersbook-venue-connector:
+  stage: wave_3
+  needs: [merit2-common, tradersbook-mt-vrdo-processor]  # depends on merit2-common and tradersbook-mt-vrdo-processor
+  script:
+    - echo "Building tradersbook-venue-connector"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-venue-connector"
+
+# Wave 4: Components that depend on multiple previous components
+secmaster-etl:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-instrument-store]  # depends on merit2-common and tradersbook-instrument-store
+  script:
+    - echo "Building secmaster-etl"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "secmaster-etl"
+
+tradersbook-mt:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-instrument-store]  # depends on merit2-common and tradersbook-instrument-store
+  script:
+    - echo "Building tradersbook-mt"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-mt"
+
+cbw-mt-springboot:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-instrument-store]  # depends on merit2-common and tradersbook-instrument-store
+  script:
+    - echo "Building cbw-mt-springboot"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "cbw-mt-springboot"
+
+msrb-realtime-trade-webapi:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-instrument-store]  # depends on merit2-common and tradersbook-instrument-store
+  script:
+    - echo "Building msrb-realtime-trade-webapi"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "msrb-realtime-trade-webapi"
+
+tradersbook-ui:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-mt]  # depends on merit2-common and tradersbook-mt
+  script:
+    - echo "Building tradersbook-ui"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-ui"
+
+tradersbook-order-processing:
+  stage: wave_4
+  needs: [merit2-common, tradersbook-mt]  # depends on merit2-common and tradersbook-mt
+  script:
+    - echo "Building tradersbook-order-processing"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "tradersbook-order-processing"
+
+cbw-ui:
+  stage: wave_4
+  needs: [merit2-common, cbw-mt-springboot]  # depends on merit2-common and cbw-mt-springboot
+  script:
+    - echo "Building cbw-ui"
+    - mvn deploy -U -s $MAVEN_SETTINGS -Dmaven.test.skip=true $MAVEN_OPTS $CUSTOM_MVN_OPTS
+  only:
+    - variables:
+        BUILD_TARGET: "ALL"
+        BUILD_TARGET: "cbw-ui"
