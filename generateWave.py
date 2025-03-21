@@ -34,7 +34,10 @@ def generate_waves(start_component):
     for wave, components in wave_definitions.items():
         if current_component in components:
             waves.append((wave, components))
-            current_component = components[-1]
+            if components[-1] in dependency_tree:
+                current_component = components[-1]
+            else:
+                break
     return waves
 
 # Get the start component as input parameter
@@ -47,4 +50,4 @@ else:
     waves = generate_waves(start_component)
     
     for wave, components in waves:
-        print(f"wave{wave}: {', '.join(components)}")
+        print(f"Wave {wave}: {', '.join(components)}")
