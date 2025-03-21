@@ -1,0 +1,57 @@
+variables:
+  ALL_COMPONENTS: "ALL"
+  COMPONENT_NAME: ""
+
+stages:
+  - build
+
+# Define template for building a component and its dependencies
+.build_template: &build_template
+  script:
+    - echo "Building $CI_JOB_NAME"
+    # Add commands to build the component here
+
+# Jobs for each component in the dependency tree
+job:tradersbook-mt-vrdo-processor:
+  stage: build
+  <<: *build_template
+
+job:tradersbook-instrument-store:
+  stage: build
+  <<: *build_template
+  needs: ["tradersbook-mt-vrdo-processor"]
+
+# Add jobs for other components following the same pattern
+
+# Define jobs based on the input variable
+build_all:
+  stage: build
+  script:
+    - if [ "$ALL_COMPONENTS" == "ALL" ]; then
+        echo "Building all components";
+        # Add jobs for all components here
+      fi
+
+build_component:
+  stage: build
+  script:
+    - if [ "$COMPONENT_NAME" != "" ]; then
+        echo "Building component $COMPONENT_NAME";
+        # Add job for specified component and its dependencies here
+      fi
+
+# Define pipeline rules
+rules:
+  - if: '$ALL_COMPONENTS == "ALL"'
+    when: always
+    start_in: always
+    allow_failure: false
+    changes:
+      - '**/*'
+
+  - if: '$COMPONENT_NAME != ""'
+    when: always
+    start_in: always
+    allow_failure: false
+    changes:
+      - '**/*'
