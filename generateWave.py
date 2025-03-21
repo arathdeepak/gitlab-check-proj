@@ -20,20 +20,21 @@ dependency_tree = {
     'cbw-ui': ['merit2-common', 'cbw-mt-springboot']
 }
 
+wave_definitions = {
+    'wave1': ['merit2-common'],
+    'wave2': ['web-sso', 'tradersbook-fincad', 'tradersbook-mt-vrdo-processor', 'secmaster-mt', 'admin-mt', 'ctm-eisl-service'],
+    'wave3': ['tradersbook-instrument-store', 'secmaster-ui', 'admin-ui', 'trade-processor-ctm', 'tradersbook-venue-connector'],
+    'wave4': ['secmaster-etl', 'tradersbook-mt', 'cbw-mt-springboot', 'msrb-realtime-trade-webapi'],
+    'wave5': ['tradersbook-ui', 'tradersbook-order-processing', 'cbw-ui']
+}
+
 def generate_waves(start_component):
     waves = []
     current_component = start_component
-    while current_component in dependency_tree:
-        wave = [current_component]
-        dependencies = dependency_tree[current_component]
-        for component in dependencies:
-            if component in dependency_tree:
-                wave.append(component)
-        waves.append(wave)
-        if dependencies:
-            current_component = dependencies[0]
-        else:
-            break
+    for wave, components in wave_definitions.items():
+        if current_component in components:
+            waves.append((wave, components))
+            current_component = components[-1]
     return waves
 
 # Get the start component as input parameter
@@ -45,5 +46,5 @@ else:
     start_component = sys.argv[1]
     waves = generate_waves(start_component)
     
-    for i, wave in enumerate(waves, start=1):
-        print(f"Wave {i}: {', '.join(wave)}")
+    for wave, components in waves:
+        print(f"wave{wave}: {', '.join(components)}")
