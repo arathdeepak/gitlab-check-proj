@@ -24,3 +24,34 @@ trigger_target_pipeline:
     BRANCH: "main"
     COMPONENTS: "component1,component2"
     ALLOW_FAILURE: "false"
+
+
+
+#!/bin/bash
+
+# Parameters passed into the script
+TARGET_PROJECT_ID=$1
+TARGET_TRIGGER_TOKEN=$2
+BRANCH=$3
+COMPONENTS=$4
+ALLOW_FAILURE=$5
+
+# Trigger the pipeline in the target repository
+curl --request POST \
+  --form "token=$TARGET_TRIGGER_TOKEN" \
+  --form "ref=$BRANCH" \
+  --form "components=$COMPONENTS" \
+  --form "allow_failure=$ALLOW_FAILURE" \
+  "https://gitlab.com/api/v4/projects/$TARGET_PROJECT_ID/trigger/pipeline"
+
+
+
+stages:
+  - trigger_target_pipeline
+
+trigger_target_pipeline:
+  stage: trigger_target_pipeline
+  script:
+    - chmod +x ci-scripts/trigger_pipeline.sh
+    - ./ci-scripts/trigger_pipeline.sh "$TARGET_PROJECT_ID" "$TARGET_TRIGGER_TOKEN" "$BRANCH" "$COMPONENTS" "$ALLOW_FAILURE"
+
