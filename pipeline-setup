@@ -1,0 +1,26 @@
+
+# .gitlab-ci-template.yml
+.trigger_target_pipeline_template:
+  script:
+    - curl --request POST \
+      --form "token=$TARGET_TRIGGER_TOKEN" \
+      --form "ref=$BRANCH" \
+      --form "components=$COMPONENTS" \
+      --form "allow_failure=$ALLOW_FAILURE" \
+      "https://gitlab.com/api/v4/projects/$TARGET_PROJECT_ID/trigger/pipeline"
+
+
+
+include:
+  - project: 'group/central-repo'  # Replace with your central repo
+    file: '/.gitlab-ci-template.yml'
+
+trigger_target_pipeline:
+  extends: .trigger_target_pipeline_template
+  stage: trigger_target_pipeline
+  variables:
+    TARGET_PROJECT_ID: "123456789"
+    TARGET_TRIGGER_TOKEN: "your_trigger_token"
+    BRANCH: "main"
+    COMPONENTS: "component1,component2"
+    ALLOW_FAILURE: "false"
