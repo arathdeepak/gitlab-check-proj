@@ -55,3 +55,18 @@ trigger_target_pipeline:
     - chmod +x ci-scripts/trigger_pipeline.sh
     - ./ci-scripts/trigger_pipeline.sh "$TARGET_PROJECT_ID" "$TARGET_TRIGGER_TOKEN" "$BRANCH" "$COMPONENTS" "$ALLOW_FAILURE"
 
+
+
+stages:
+  - trigger_child_pipeline
+
+trigger_child_pipeline:
+  stage: trigger_child_pipeline
+  trigger:
+    include: 'child-pipeline.yml'
+    strategy: depend  # Ensures the parent pipeline waits for the child pipeline to finish
+    variables:
+      BRANCH: "main"           # Variable to pass to the child pipeline
+      COMPONENTS: "component1"  # Another variable
+      ALLOW_FAILURE: "true"     # Yet another variable
+
