@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Fail on error
+set -e
+
+# Load image tag from exported GitLab CI artifact
+if [[ ! -f image.env ]]; then
+  echo "❌ image.env not found. Please download it from GitLab CI artifacts."
+  exit 1
+fi
+
+source image.env
+
+# Extract just the tag from the full image name (e.g., 0.0.2-SNAPSHOT-abc12345)
+IMAGE_TAG=${FULL_IMAGE##*:}
+
+# Replace tag placeholder in docker-compose template
+echo "🔧 Substituting __IMAGE_TAG__ with $IMAGE_TAG"
+sed "s|__IMAGE_TAG__|$IMAGE_TAG|" docker-compose.template.yml > docker-compose.yml
+
+# Pull the image
+echo "📦 Pulling image: $FULL_IMAGE"
+docker pull "$FULL_IMAGE"
+
+# Bring up services
+echo "🚀 Starting services..."
+docker-compose up -d
+
+echo "✅ Deployment complete!"
