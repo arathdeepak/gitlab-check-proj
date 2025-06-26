@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-schedule
+  labels:
+    app: {{ .Chart.Name }}-schedule
+spec:
+  ports:
+    - port: {{ .Values.schedule.servicePort }}
+      targetPort: {{ .Values.schedule.servicePort }}
+  selector:
+    app: {{ .Chart.Name }}-schedule
