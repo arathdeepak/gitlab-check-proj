@@ -1,0 +1,10 @@
+my-chart/
+├── Chart.yaml
+├── values.yaml
+├── templates/
+│   ├── app-deployment.yaml
+│   ├── schedule-deployment.yaml
+│   ├── redis-deployment.yaml
+│   ├── redis-service.yaml
+│   ├── app-service.yaml
+│   ├── schedule-service.yaml
