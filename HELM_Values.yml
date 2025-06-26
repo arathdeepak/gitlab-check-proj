@@ -1,0 +1,20 @@
+image:
+  repository: your-python-app-image
+  tag: latest
+  pullPolicy: IfNotPresent
+
+redis:
+  image: redis:6.2
+  port: 6379
+
+app:
+  command: ["python"]
+  args: ["app.py"]
+  replicas: 1
+  servicePort: 8080
+
+schedule:
+  command: ["python"]
+  args: ["modules/schedule.py"]
+  replicas: 1
+  servicePort: 8081
