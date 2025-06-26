@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-schedule
+  labels:
+    app: {{ .Chart.Name }}-schedule
+spec:
+  replicas: {{ .Values.schedule.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-schedule
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-schedule
+    spec:
+      containers:
+        - name: schedule-container
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: {{ .Values.schedule.command | toJson }}
+          args: {{ .Values.schedule.args | toJson }}
+          ports:
+            - containerPort: {{ .Values.schedule.servicePort }}
