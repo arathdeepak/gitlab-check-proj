@@ -1,0 +1,10 @@
+replicaCount: 1
+
+image:
+  repository: your-python-app-image
+  tag: latest
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  host: hostname
