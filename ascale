@@ -3,3 +3,24 @@ autoscaling:
     minReplicas: 2
     maxReplicas: 10
     targetCPUUtilizationPercentage: 80
+
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: py-app-2-hpa
+  namespace: default  # Adjust if using a different namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: py-app-2  # Name of the deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
